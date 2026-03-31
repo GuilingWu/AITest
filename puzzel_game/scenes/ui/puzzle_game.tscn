@@ -1,0 +1,234 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/ControlPanel.cs" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="1_style"]
+bg_color = Color(0.0666667, 0.101961, 0.164706, 0.82)
+border_color = Color(0.380392, 0.690196, 0.882353, 0.28)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="2_style"]
+bg_color = Color(0.129412, 0.345098, 0.470588, 0.94)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+content_margin_left = 20.0
+content_margin_top = 14.0
+content_margin_right = 20.0
+content_margin_bottom = 14.0
+
+[sub_resource type="Theme" id="3_theme"]
+Button/colors/font_color = Color(0.980392, 0.984314, 0.992157, 1)
+Button/styles/normal = SubResource("2_style")
+Button/styles/hover = SubResource("2_style")
+Button/styles/pressed = SubResource("2_style")
+Label/colors/font_color = Color(0.960784, 0.972549, 0.988235, 1)
+Panel/styles/panel = SubResource("1_style")
+default_font_size = 18
+
+[sub_resource type="Environment" id="4_env"]
+background_mode = 1
+background_color = Color(0.027451, 0.0470588, 0.0862745, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.729412, 0.839216, 0.937255, 1)
+ambient_light_energy = 1.2
+
+[sub_resource type="BoxMesh" id="5_mesh"]
+size = Vector3(10, 0.05, 6)
+
+[sub_resource type="StandardMaterial3D" id="6_mat"]
+albedo_color = Color(0.145098, 0.278431, 0.372549, 0.5)
+transparency = 1
+roughness = 0.85
+
+[node name="PuzzleGameUI" type="Control"]
+script = ExtResource("1")
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("3_theme")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0196078, 0.0313726, 0.0627451, 1)
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 18.0
+offset_right = -16.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RootColumn" type="VBoxContainer" parent="SafeArea"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="TopBarPanel" type="Panel" parent="SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+
+[node name="TopBar" type="HBoxContainer" parent="SafeArea/RootColumn/TopBarPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = 14.0
+offset_right = -14.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="BackButton" type="Button" parent="SafeArea/RootColumn/TopBarPanel/TopBar"]
+custom_minimum_size = Vector2(90, 44)
+layout_mode = 2
+text = "Exit"
+
+[node name="ProgressLabel" type="Label" parent="SafeArea/RootColumn/TopBarPanel/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Progress 0 / 0"
+
+[node name="StarLabel" type="Label" parent="SafeArea/RootColumn/TopBarPanel/TopBar"]
+layout_mode = 2
+text = "0 Stars"
+
+[node name="PuzzleViewportContainer" type="SubViewportContainer" parent="SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 620)
+layout_mode = 2
+size_flags_vertical = 3
+stretch = true
+
+[node name="PuzzleViewport" type="SubViewport" parent="SafeArea/RootColumn/PuzzleViewportContainer"]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(720, 1280)
+own_world_3d = true
+
+[node name="PuzzleRoot" type="Node3D" parent="SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+environment = SubResource("4_env")
+
+[node name="Camera3D" type="Camera3D" parent="SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 6.5, 8.5)
+current = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+transform = Transform3D(0.819152, -0.280166, 0.501626, 0, 0.873305, 0.487175, -0.573576, -0.399317, 0.71461, 0, 5, 0)
+light_energy = 2.0
+
+[node name="PuzzleAreaRoot" type="Node3D" parent="SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.2)
+
+[node name="PuzzleAreaMesh" type="MeshInstance3D" parent="SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot/PuzzleAreaRoot"]
+mesh = SubResource("5_mesh")
+material_override = SubResource("6_mat")
+
+[node name="StorageAreaRoot" type="Node3D" parent="SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+transform = Transform3D(0.75, 0, 0, 0, 1, 0, 0, 0, 0.75, 0, 0, 3.2)
+
+[node name="StorageAreaMesh" type="MeshInstance3D" parent="SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot/StorageAreaRoot"]
+mesh = SubResource("5_mesh")
+material_override = SubResource("6_mat")
+
+[node name="PiecesRoot" type="Node3D" parent="SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+
+[node name="GroupsRoot" type="Node3D" parent="SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+
+[node name="EffectsRoot" type="Node3D" parent="SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+
+[node name="BottomPanel" type="Panel" parent="SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 260)
+layout_mode = 2
+
+[node name="BottomColumn" type="VBoxContainer" parent="SafeArea/RootColumn/BottomPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = 14.0
+offset_right = -14.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="StorageModeTabs" type="HBoxContainer" parent="SafeArea/RootColumn/BottomPanel/BottomColumn"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ListModeButton" type="Button" parent="SafeArea/RootColumn/BottomPanel/BottomColumn/StorageModeTabs"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Horizontal List"
+
+[node name="StackModeButton" type="Button" parent="SafeArea/RootColumn/BottomPanel/BottomColumn/StorageModeTabs"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Stack Area"
+
+[node name="HorizontalPieceList" type="ScrollContainer" parent="SafeArea/RootColumn/BottomPanel/BottomColumn"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+horizontal_scroll_mode = 1
+
+[node name="Items" type="HBoxContainer" parent="SafeArea/RootColumn/BottomPanel/BottomColumn/HorizontalPieceList"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Piece01" type="Panel" parent="SafeArea/RootColumn/BottomPanel/BottomColumn/HorizontalPieceList/Items"]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+
+[node name="Piece02" type="Panel" parent="SafeArea/RootColumn/BottomPanel/BottomColumn/HorizontalPieceList/Items"]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+
+[node name="Piece03" type="Panel" parent="SafeArea/RootColumn/BottomPanel/BottomColumn/HorizontalPieceList/Items"]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+
+[node name="StackHintOverlay" type="Label" parent="SafeArea/RootColumn/BottomPanel/BottomColumn"]
+visible = false
+layout_mode = 2
+modulate = Color(0.776471, 0.839216, 0.917647, 0.85)
+text = "In stack mode, drag pieces from the lower 3D area."
+
+[node name="OverlayLayer" type="CanvasLayer" parent="."]
+
+[node name="ToastLabel" type="Label" parent="OverlayLayer"]
+visible = false
+offset_left = 180.0
+offset_top = 120.0
+offset_right = 540.0
+offset_bottom = 160.0
+horizontal_alignment = 1
+text = "Merge Success"

@@ -1,0 +1,153 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/DifficultySetupView.cs" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="1_style"]
+bg_color = Color(0.0666667, 0.101961, 0.164706, 0.82)
+border_color = Color(0.380392, 0.690196, 0.882353, 0.28)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="2_style"]
+bg_color = Color(0.129412, 0.345098, 0.470588, 0.94)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+content_margin_left = 20.0
+content_margin_top = 18.0
+content_margin_right = 20.0
+content_margin_bottom = 18.0
+
+[sub_resource type="Theme" id="3_theme"]
+Button/colors/font_color = Color(0.980392, 0.984314, 0.992157, 1)
+Button/styles/normal = SubResource("2_style")
+Button/styles/hover = SubResource("2_style")
+Button/styles/pressed = SubResource("2_style")
+CheckButton/colors/font_color = Color(0.960784, 0.972549, 0.988235, 1)
+Label/colors/font_color = Color(0.960784, 0.972549, 0.988235, 1)
+Panel/styles/panel = SubResource("1_style")
+default_font_size = 18
+
+[node name="DifficultySetupUI" type="Control"]
+script = ExtResource("1")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("3_theme")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0196078, 0.0313726, 0.0627451, 1)
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 28.0
+offset_right = -24.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContentColumn" type="VBoxContainer" parent="SafeArea"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="TitlePanel" type="Panel" parent="SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+
+[node name="TitleMargin" type="MarginContainer" parent="SafeArea/ContentColumn/TitlePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="SafeArea/ContentColumn/TitlePanel/TitleMargin"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Difficulty"
+
+[node name="RowsBox" type="SpinBox" parent="SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+min_value = 3.0
+max_value = 6.0
+step = 1.0
+value = 4.0
+prefix = "Rows "
+
+[node name="ColumnsBox" type="SpinBox" parent="SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+min_value = 3.0
+max_value = 6.0
+step = 1.0
+value = 4.0
+prefix = "Cols "
+
+[node name="RotationToggle" type="CheckButton" parent="SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+button_pressed = true
+text = "Shuffle Rotation"
+
+[node name="StorageToggle" type="CheckButton" parent="SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "Use Horizontal List"
+
+[node name="StarsPanel" type="Panel" parent="SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 76)
+layout_mode = 2
+
+[node name="StarsMargin" type="MarginContainer" parent="SafeArea/ContentColumn/StarsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = 18.0
+offset_right = -18.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StarsLabel" type="Label" parent="SafeArea/ContentColumn/StarsPanel/StarsMargin"]
+layout_mode = 2
+horizontal_alignment = 1
+text = "Current Difficulty: 3 / 5"
+
+[node name="Spacer" type="Control" parent="SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="StartButton" type="Button" parent="SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+text = "Start Puzzle"

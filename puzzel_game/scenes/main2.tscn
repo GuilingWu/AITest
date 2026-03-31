@@ -1,0 +1,463 @@
+﻿[gd_scene load_steps=10 format=3 uid="uid://ckq1w4r8j5n6m"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.0666667, 0.101961, 0.164706, 0.8)
+border_color = Color(0.380392, 0.690196, 0.882353, 0.28)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0, 0, 0, 0.2)
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
+bg_color = Color(0.129412, 0.345098, 0.470588, 0.94)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+content_margin_left = 20.0
+content_margin_top = 14.0
+content_margin_right = 20.0
+content_margin_bottom = 14.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_hover"]
+bg_color = Color(0.188235, 0.447059, 0.592157, 0.98)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+content_margin_left = 20.0
+content_margin_top = 14.0
+content_margin_right = 20.0
+content_margin_bottom = 14.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_pressed"]
+bg_color = Color(0.0901961, 0.258824, 0.352941, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+content_margin_left = 20.0
+content_margin_top = 14.0
+content_margin_right = 20.0
+content_margin_bottom = 14.0
+
+[sub_resource type="Theme" id="Theme_game"]
+default_font_size = 18
+Button/colors/font_color = Color(0.980392, 0.984314, 0.992157, 1)
+Button/styles/normal = SubResource("StyleBoxFlat_button_normal")
+Button/styles/hover = SubResource("StyleBoxFlat_button_hover")
+Button/styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+CheckButton/colors/font_color = Color(0.960784, 0.972549, 0.988235, 1)
+Label/colors/font_color = Color(0.960784, 0.972549, 0.988235, 1)
+Panel/styles/panel = SubResource("StyleBoxFlat_panel")
+
+[sub_resource type="Environment" id="Environment_puzzle"]
+background_mode = 1
+background_color = Color(0.027451, 0.0470588, 0.0862745, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.729412, 0.839216, 0.937255, 1)
+ambient_light_energy = 1.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_area"]
+size = Vector3(10, 0.05, 6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_area"]
+albedo_color = Color(0.145098, 0.278431, 0.372549, 0.5)
+transparency = 1
+roughness = 0.85
+
+[node name="Main" type="Node"]
+
+[node name="GameManager" type="Node" parent="."]
+
+[node name="UIRoot" type="CanvasLayer" parent="."]
+
+[node name="ScreenRouter" type="Control" parent="UIRoot"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_game")
+
+[node name="Background" type="ColorRect" parent="UIRoot/ScreenRouter"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0196078, 0.0313726, 0.0627451, 1)
+
+[node name="ThemeSelectUI" type="Control" parent="UIRoot/ScreenRouter"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SafeArea" type="MarginContainer" parent="UIRoot/ScreenRouter/ThemeSelectUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 24.0
+offset_right = -20.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContentColumn" type="VBoxContainer" parent="UIRoot/ScreenRouter/ThemeSelectUI/SafeArea"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="UIRoot/ScreenRouter/ThemeSelectUI/SafeArea/ContentColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "选择主题"
+
+[node name="Subtitle" type="Label" parent="UIRoot/ScreenRouter/ThemeSelectUI/SafeArea/ContentColumn"]
+layout_mode = 2
+modulate = Color(0.776471, 0.839216, 0.917647, 0.85)
+text = "选择一个图集，或者从相册导入自己的图片。"
+
+[node name="AnimalsButton" type="Button" parent="UIRoot/ScreenRouter/ThemeSelectUI/SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+text = "动物篇  3/12"
+
+[node name="SceneryButton" type="Button" parent="UIRoot/ScreenRouter/ThemeSelectUI/SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+text = "风景篇  1/10"
+
+[node name="ArchitectureButton" type="Button" parent="UIRoot/ScreenRouter/ThemeSelectUI/SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+text = "建筑篇  0/8"
+
+[node name="AlbumButton" type="Button" parent="UIRoot/ScreenRouter/ThemeSelectUI/SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+text = "从相册选择"
+
+[node name="ImageSelectUI" type="Control" parent="UIRoot/ScreenRouter"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SafeArea" type="MarginContainer" parent="UIRoot/ScreenRouter/ImageSelectUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 24.0
+offset_right = -20.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContentColumn" type="VBoxContainer" parent="UIRoot/ScreenRouter/ImageSelectUI/SafeArea"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="HeaderRow" type="HBoxContainer" parent="UIRoot/ScreenRouter/ImageSelectUI/SafeArea/ContentColumn"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BackButton" type="Button" parent="UIRoot/ScreenRouter/ImageSelectUI/SafeArea/ContentColumn/HeaderRow"]
+custom_minimum_size = Vector2(84, 48)
+layout_mode = 2
+text = "返回"
+
+[node name="Title" type="Label" parent="UIRoot/ScreenRouter/ImageSelectUI/SafeArea/ContentColumn/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "风景篇"
+
+[node name="ImageList" type="VBoxContainer" parent="UIRoot/ScreenRouter/ImageSelectUI/SafeArea/ContentColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="Image01" type="Button" parent="UIRoot/ScreenRouter/ImageSelectUI/SafeArea/ContentColumn/ImageList"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "海岸清晨   已完成   ★★★★☆"
+
+[node name="Image02" type="Button" parent="UIRoot/ScreenRouter/ImageSelectUI/SafeArea/ContentColumn/ImageList"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "薄雾山谷   未挑战"
+
+[node name="DifficultySetupUI" type="Control" parent="UIRoot/ScreenRouter"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SafeArea" type="MarginContainer" parent="UIRoot/ScreenRouter/DifficultySetupUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 24.0
+offset_right = -20.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContentColumn" type="VBoxContainer" parent="UIRoot/ScreenRouter/DifficultySetupUI/SafeArea"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="UIRoot/ScreenRouter/DifficultySetupUI/SafeArea/ContentColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "难度设置"
+
+[node name="RowsBox" type="SpinBox" parent="UIRoot/ScreenRouter/DifficultySetupUI/SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+min_value = 3.0
+max_value = 6.0
+step = 1.0
+value = 4.0
+prefix = "行 "
+
+[node name="ColumnsBox" type="SpinBox" parent="UIRoot/ScreenRouter/DifficultySetupUI/SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+min_value = 3.0
+max_value = 6.0
+step = 1.0
+value = 4.0
+prefix = "列 "
+
+[node name="RotationToggle" type="CheckButton" parent="UIRoot/ScreenRouter/DifficultySetupUI/SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+button_pressed = true
+text = "打乱旋转方向"
+
+[node name="StorageToggle" type="CheckButton" parent="UIRoot/ScreenRouter/DifficultySetupUI/SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "使用滑动列表排列"
+
+[node name="StarsLabel" type="Label" parent="UIRoot/ScreenRouter/DifficultySetupUI/SafeArea/ContentColumn"]
+layout_mode = 2
+text = "当前难度: ★★★☆☆"
+
+[node name="StartButton" type="Button" parent="UIRoot/ScreenRouter/DifficultySetupUI/SafeArea/ContentColumn"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+text = "开始拼图"
+
+[node name="PuzzleGameUI" type="Control" parent="UIRoot/ScreenRouter"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SafeArea" type="MarginContainer" parent="UIRoot/ScreenRouter/PuzzleGameUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 18.0
+offset_right = -16.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RootColumn" type="VBoxContainer" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="TopBar" type="HBoxContainer" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BackButton" type="Button" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/TopBar"]
+custom_minimum_size = Vector2(84, 44)
+layout_mode = 2
+text = "退出"
+
+[node name="ProgressLabel" type="Label" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "进度 3 / 16"
+
+[node name="StarLabel" type="Label" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/TopBar"]
+layout_mode = 2
+text = "★★★★☆"
+
+[node name="PuzzleViewportContainer" type="SubViewportContainer" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 420)
+layout_mode = 2
+size_flags_vertical = 3
+stretch = true
+
+[node name="PuzzleViewport" type="SubViewport" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/PuzzleViewportContainer"]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(720, 960)
+own_world_3d = true
+
+[node name="PuzzleRoot" type="Node3D" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+environment = SubResource("Environment_puzzle")
+
+[node name="Camera3D" type="Camera3D" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 6.5, 8.5)
+current = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+transform = Transform3D(0.819152, -0.280166, 0.501626, 0, 0.873305, 0.487175, -0.573576, -0.399317, 0.71461, 0, 5, 0)
+light_energy = 2.0
+
+[node name="PuzzleAreaRoot" type="Node3D" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.2)
+
+[node name="AreaMesh" type="MeshInstance3D" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot/PuzzleAreaRoot"]
+mesh = SubResource("BoxMesh_area")
+material_override = SubResource("StandardMaterial3D_area")
+
+[node name="StorageAreaRoot" type="Node3D" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+transform = Transform3D(0.75, 0, 0, 0, 1, 0, 0, 0, 0.75, 0, 0, 3.2)
+
+[node name="AreaMesh" type="MeshInstance3D" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot/StorageAreaRoot"]
+mesh = SubResource("BoxMesh_area")
+material_override = SubResource("StandardMaterial3D_area")
+
+[node name="PiecesRoot" type="Node3D" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+
+[node name="GroupsRoot" type="Node3D" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+
+[node name="BottomPanel" type="VBoxContainer" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StorageModeTabs" type="HBoxContainer" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/BottomPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ListModeButton" type="Button" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/BottomPanel/StorageModeTabs"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "滑动列表"
+
+[node name="StackModeButton" type="Button" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/BottomPanel/StorageModeTabs"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "堆叠区域"
+
+[node name="HorizontalPieceList" type="ScrollContainer" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/BottomPanel"]
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+horizontal_scroll_mode = 1
+
+[node name="Items" type="HBoxContainer" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/BottomPanel/HorizontalPieceList"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Piece01" type="Panel" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/BottomPanel/HorizontalPieceList/Items"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Piece02" type="Panel" parent="UIRoot/ScreenRouter/PuzzleGameUI/SafeArea/RootColumn/BottomPanel/HorizontalPieceList/Items"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="ResultUI" type="Control" parent="UIRoot/ScreenRouter"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Center" type="CenterContainer" parent="UIRoot/ScreenRouter/ResultUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Card" type="Panel" parent="UIRoot/ScreenRouter/ResultUI/Center"]
+custom_minimum_size = Vector2(0, 320)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Content" type="VBoxContainer" parent="UIRoot/ScreenRouter/ResultUI/Center/Card"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="UIRoot/ScreenRouter/ResultUI/Center/Card/Content"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 30
+text = "拼图完成"
+
+[node name="Stars" type="Label" parent="UIRoot/ScreenRouter/ResultUI/Center/Card/Content"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+text = "★★★★★"
+
+[node name="Summary" type="Label" parent="UIRoot/ScreenRouter/ResultUI/Center/Card/Content"]
+layout_mode = 2
+horizontal_alignment = 1
+modulate = Color(0.776471, 0.839216, 0.917647, 0.85)
+text = "本次挑战刷新了你的最佳星级记录。"
+
+[node name="RetryButton" type="Button" parent="UIRoot/ScreenRouter/ResultUI/Center/Card/Content"]
+custom_minimum_size = Vector2(260, 52)
+layout_mode = 2
+text = "再玩一次"
+
+[node name="BackToThemeButton" type="Button" parent="UIRoot/ScreenRouter/ResultUI/Center/Card/Content"]
+custom_minimum_size = Vector2(260, 52)
+layout_mode = 2
+text = "返回主题"
