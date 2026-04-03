@@ -1,41 +1,41 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=2 format=3 uid="uid://c575gin840cbh"]
 
-[ext_resource type="Script" path="res://scripts/ui/ImageSelectView.cs" id="1"]
-
-[sub_resource type="StyleBoxFlat" id="1_style"]
-bg_color = Color(0.0666667, 0.101961, 0.164706, 0.82)
-border_color = Color(0.380392, 0.690196, 0.882353, 0.28)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-corner_radius_top_left = 24
-corner_radius_top_right = 24
-corner_radius_bottom_right = 24
-corner_radius_bottom_left = 24
+[ext_resource type="Script" path="res://scripts/ui/ImageSelectView.cs" id="1_image"]
 
 [sub_resource type="StyleBoxFlat" id="2_style"]
+content_margin_left = 20.0
+content_margin_top = 18.0
+content_margin_right = 20.0
+content_margin_bottom = 18.0
 bg_color = Color(0.129412, 0.345098, 0.470588, 0.94)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
-content_margin_left = 20.0
-content_margin_top = 18.0
-content_margin_right = 20.0
-content_margin_bottom = 18.0
+
+[sub_resource type="StyleBoxFlat" id="1_style"]
+bg_color = Color(0.0666667, 0.101961, 0.164706, 0.82)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.380392, 0.690196, 0.882353, 0.28)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
 
 [sub_resource type="Theme" id="3_theme"]
+default_font_size = 18
 Button/colors/font_color = Color(0.980392, 0.984314, 0.992157, 1)
-Button/styles/normal = SubResource("2_style")
 Button/styles/hover = SubResource("2_style")
+Button/styles/normal = SubResource("2_style")
 Button/styles/pressed = SubResource("2_style")
 Label/colors/font_color = Color(0.960784, 0.972549, 0.988235, 1)
 Panel/styles/panel = SubResource("1_style")
-default_font_size = 18
 
-[node name="ImageSelectUI" type="Control"]
-script = ExtResource("1")
+[node name="ImageSelectUI" type="Control" unique_id=1117529764]
+script = ExtResource("1_image")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -44,7 +44,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = SubResource("3_theme")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=356844328]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -53,7 +53,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.0196078, 0.0313726, 0.0627451, 1)
 
-[node name="SafeArea" type="MarginContainer" parent="."]
+[node name="SafeArea" type="MarginContainer" parent="." unique_id=1062641125]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -65,51 +65,135 @@ offset_bottom = -28.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ContentColumn" type="VBoxContainer" parent="SafeArea"]
+[node name="ContentColumn" type="VBoxContainer" parent="SafeArea" unique_id=1406279560]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 16
 
-[node name="HeaderRow" type="HBoxContainer" parent="SafeArea/ContentColumn"]
+[node name="HeaderRow" type="HBoxContainer" parent="SafeArea/ContentColumn" unique_id=1263764489]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="BackButton" type="Button" parent="SafeArea/ContentColumn/HeaderRow"]
+[node name="BackButton" type="Button" parent="SafeArea/ContentColumn/HeaderRow" unique_id=2040584824]
 custom_minimum_size = Vector2(96, 52)
 layout_mode = 2
 text = "Back"
 
-[node name="Title" type="Label" parent="SafeArea/ContentColumn/HeaderRow"]
+[node name="Title" type="Label" parent="SafeArea/ContentColumn/HeaderRow" unique_id=1592077537]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 30
 text = "Scenery"
 
-[node name="Scroll" type="ScrollContainer" parent="SafeArea/ContentColumn"]
+[node name="Scroll" type="ScrollContainer" parent="SafeArea/ContentColumn" unique_id=587308824]
 layout_mode = 2
 size_flags_vertical = 3
-vertical_scroll_mode = 1
 
-[node name="ImageList" type="VBoxContainer" parent="SafeArea/ContentColumn/Scroll"]
+[node name="ImageList" type="VBoxContainer" parent="SafeArea/ContentColumn/Scroll" unique_id=272016014]
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="ImageCard01" type="Button" parent="SafeArea/ContentColumn/Scroll/ImageList"]
+[node name="ImageCard01" type="Button" parent="SafeArea/ContentColumn/Scroll/ImageList" unique_id=2012201797]
 custom_minimum_size = Vector2(0, 130)
 layout_mode = 2
-text = "Coast Morning   Done   4 Stars"
+flat = true
 
-[node name="ImageCard02" type="Button" parent="SafeArea/ContentColumn/Scroll/ImageList"]
-custom_minimum_size = Vector2(0, 130)
-layout_mode = 2
-text = "Misty Valley   New"
+[node name="Placeholder" type="ColorRect" parent="SafeArea/ContentColumn/Scroll/ImageList/ImageCard01" unique_id=1553973822]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 126.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.101961, 0.219608, 0.309804, 1)
 
-[node name="ImageCard03" type="Button" parent="SafeArea/ContentColumn/Scroll/ImageList"]
-custom_minimum_size = Vector2(0, 130)
-layout_mode = 2
-text = "Lake Dusk   3 Stars"
+[node name="Preview" type="TextureRect" parent="SafeArea/ContentColumn/Scroll/ImageList/ImageCard01" unique_id=1216582971]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
 
-[node name="ImageCard04" type="Button" parent="SafeArea/ContentColumn/Scroll/ImageList"]
+[node name="ImageCard02" type="Button" parent="SafeArea/ContentColumn/Scroll/ImageList" unique_id=1881408883]
 custom_minimum_size = Vector2(0, 130)
 layout_mode = 2
-text = "Canyon Sunset   New"
+flat = true
+
+[node name="Placeholder" type="ColorRect" parent="SafeArea/ContentColumn/Scroll/ImageList/ImageCard02" unique_id=1945653389]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.101961, 0.219608, 0.309804, 1)
+
+[node name="Preview" type="TextureRect" parent="SafeArea/ContentColumn/Scroll/ImageList/ImageCard02" unique_id=627779322]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ImageCard03" type="Button" parent="SafeArea/ContentColumn/Scroll/ImageList" unique_id=354961474]
+custom_minimum_size = Vector2(0, 130)
+layout_mode = 2
+flat = true
+
+[node name="Placeholder" type="ColorRect" parent="SafeArea/ContentColumn/Scroll/ImageList/ImageCard03" unique_id=1931954642]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.101961, 0.219608, 0.309804, 1)
+
+[node name="Preview" type="TextureRect" parent="SafeArea/ContentColumn/Scroll/ImageList/ImageCard03" unique_id=2096057858]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ImageCard04" type="Button" parent="SafeArea/ContentColumn/Scroll/ImageList" unique_id=1413335061]
+custom_minimum_size = Vector2(0, 130)
+layout_mode = 2
+flat = true
+
+[node name="Placeholder" type="ColorRect" parent="SafeArea/ContentColumn/Scroll/ImageList/ImageCard04" unique_id=538843659]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.101961, 0.219608, 0.309804, 1)
+
+[node name="Preview" type="TextureRect" parent="SafeArea/ContentColumn/Scroll/ImageList/ImageCard04" unique_id=2091433871]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6

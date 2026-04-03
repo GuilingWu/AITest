@@ -49,17 +49,22 @@ public partial class AreaManager : Node
     {
         if (mode == StorageMode.HorizontalList)
         {
-            var x = StorageRectWorld.Position.X + 1.0f + index * 1.2f;
+            var x = StorageRectWorld.Position.X + 0.8f + index * 1.15f;
             var z = StorageRectWorld.Position.Y + StorageRectWorld.Size.Y * 0.5f;
             return new Vector3(x, 0.0f, z);
         }
 
-        var rng = new RandomNumberGenerator();
-        rng.Randomize();
-        return new Vector3(
-            rng.RandfRange(StorageRectWorld.Position.X, StorageRectWorld.End.X),
-            rng.RandfRange(-0.05f, 0.05f),
-            rng.RandfRange(StorageRectWorld.Position.Y, StorageRectWorld.End.Y));
+        var columns = 4;
+        var column = index % columns;
+        var row = index / columns;
+        var spacingX = 1.55f;
+        var spacingZ = 1.1f;
+        var startX = StorageRectWorld.Position.X + 0.9f;
+        var startZ = StorageRectWorld.Position.Y + 0.7f;
+        var xPos = Mathf.Min(startX + column * spacingX, StorageRectWorld.End.X - 0.6f);
+        var zPos = Mathf.Min(startZ + row * spacingZ, StorageRectWorld.End.Y - 0.6f);
+        var yPos = 0.02f * (index % 3);
+        return new Vector3(xPos, yPos, zPos);
     }
 
     public Vector3 ClampToPuzzleArea(Vector3 worldPoint)

@@ -1,49 +1,15 @@
-﻿[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/preview/main_preview.gd" id="1"]
-
-[sub_resource type="StyleBoxFlat" id="1_style"]
-bg_color = Color(0.0666667, 0.101961, 0.164706, 0.82)
-border_color = Color(0.380392, 0.690196, 0.882353, 0.28)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-corner_radius_top_left = 24
-corner_radius_top_right = 24
-corner_radius_bottom_right = 24
-corner_radius_bottom_left = 24
-
-[sub_resource type="StyleBoxFlat" id="2_style"]
-bg_color = Color(0.129412, 0.345098, 0.470588, 0.94)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-content_margin_left = 20.0
-content_margin_top = 18.0
-content_margin_right = 20.0
-content_margin_bottom = 18.0
-
-[sub_resource type="Theme" id="3_theme"]
-Button/colors/font_color = Color(0.980392, 0.984314, 0.992157, 1)
-Button/styles/normal = SubResource("2_style")
-Button/styles/hover = SubResource("2_style")
-Button/styles/pressed = SubResource("2_style")
-CheckButton/colors/font_color = Color(0.960784, 0.972549, 0.988235, 1)
-Label/colors/font_color = Color(0.960784, 0.972549, 0.988235, 1)
-Panel/styles/panel = SubResource("1_style")
-default_font_size = 18
+[ext_resource type="Script" uid="uid://00l4t3ymhm7l" path="res://scripts/preview/main_preview.gd" id="1_main_preview"]
 
 [node name="Main" type="Control"]
-script = ExtResource("1")
+script = ExtResource("1_main_preview")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = SubResource("3_theme")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
@@ -52,7 +18,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 color = Color(0.0196078, 0.0313726, 0.0627451, 1)
 
 [node name="ThemeSelectUI" type="Control" parent="."]
@@ -62,7 +27,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 
 [node name="SafeArea" type="MarginContainer" parent="ThemeSelectUI"]
 layout_mode = 1
@@ -70,75 +34,67 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 24.0
-offset_top = 28.0
+offset_top = 24.0
 offset_right = -24.0
-offset_bottom = -28.0
+offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 
 [node name="ContentColumn" type="VBoxContainer" parent="ThemeSelectUI/SafeArea"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 18
-mouse_filter = 2
+theme_override_constants/separation = 12
 
 [node name="HeaderPanel" type="Panel" parent="ThemeSelectUI/SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 180)
+custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
-mouse_filter = 2
 
 [node name="HeaderMargin" type="MarginContainer" parent="ThemeSelectUI/SafeArea/ContentColumn/HeaderPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 22.0
-offset_top = 22.0
-offset_right = -22.0
-offset_bottom = -22.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 
 [node name="HeaderColumn" type="VBoxContainer" parent="ThemeSelectUI/SafeArea/ContentColumn/HeaderPanel/HeaderMargin"]
 layout_mode = 2
-theme_override_constants/separation = 10
-mouse_filter = 2
+theme_override_constants/separation = 8
 
 [node name="Title" type="Label" parent="ThemeSelectUI/SafeArea/ContentColumn/HeaderPanel/HeaderMargin/HeaderColumn"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
 text = "Choose Theme"
 
 [node name="Subtitle" type="Label" parent="ThemeSelectUI/SafeArea/ContentColumn/HeaderPanel/HeaderMargin/HeaderColumn"]
 layout_mode = 2
-modulate = Color(0.776471, 0.839216, 0.917647, 0.85)
 text = "Tap a theme to enter the image list."
 
 [node name="ThemeList" type="VBoxContainer" parent="ThemeSelectUI/SafeArea/ContentColumn"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 14
-mouse_filter = 2
+theme_override_constants/separation = 12
 
 [node name="AnimalsButton" type="Button" parent="ThemeSelectUI/SafeArea/ContentColumn/ThemeList"]
-custom_minimum_size = Vector2(0, 84)
+custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 text = "Animals    3 / 12"
 
 [node name="SceneryButton" type="Button" parent="ThemeSelectUI/SafeArea/ContentColumn/ThemeList"]
-custom_minimum_size = Vector2(0, 84)
+custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 text = "Scenery    1 / 10"
 
 [node name="ArchitectureButton" type="Button" parent="ThemeSelectUI/SafeArea/ContentColumn/ThemeList"]
-custom_minimum_size = Vector2(0, 84)
+custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 text = "Architecture    0 / 8"
 
 [node name="AlbumButton" type="Button" parent="ThemeSelectUI/SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 64)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 text = "Pick From Album"
 
@@ -150,7 +106,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 
 [node name="SafeArea" type="MarginContainer" parent="ImageSelectUI"]
 layout_mode = 1
@@ -158,64 +113,146 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 24.0
-offset_top = 28.0
+offset_top = 24.0
 offset_right = -24.0
-offset_bottom = -28.0
+offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 
 [node name="ContentColumn" type="VBoxContainer" parent="ImageSelectUI/SafeArea"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 16
-mouse_filter = 2
+theme_override_constants/separation = 12
 
 [node name="HeaderRow" type="HBoxContainer" parent="ImageSelectUI/SafeArea/ContentColumn"]
 layout_mode = 2
 theme_override_constants/separation = 12
-mouse_filter = 2
 
 [node name="BackButton" type="Button" parent="ImageSelectUI/SafeArea/ContentColumn/HeaderRow"]
-custom_minimum_size = Vector2(96, 52)
+custom_minimum_size = Vector2(96, 48)
 layout_mode = 2
 text = "Back"
 
 [node name="Title" type="Label" parent="ImageSelectUI/SafeArea/ContentColumn/HeaderRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 30
 text = "Scenery"
 
 [node name="Scroll" type="ScrollContainer" parent="ImageSelectUI/SafeArea/ContentColumn"]
 layout_mode = 2
 size_flags_vertical = 3
-vertical_scroll_mode = 1
 
 [node name="ImageList" type="VBoxContainer" parent="ImageSelectUI/SafeArea/ContentColumn/Scroll"]
 layout_mode = 2
-theme_override_constants/separation = 14
-mouse_filter = 2
+theme_override_constants/separation = 12
 
 [node name="ImageCard01" type="Button" parent="ImageSelectUI/SafeArea/ContentColumn/Scroll/ImageList"]
-custom_minimum_size = Vector2(0, 130)
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
-text = "Coast Morning   Done   4 Stars"
+flat = true
+text = ""
+
+[node name="Placeholder" type="ColorRect" parent="ImageSelectUI/SafeArea/ContentColumn/Scroll/ImageList/ImageCard01"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.101961, 0.219608, 0.309804, 1)
+
+[node name="Preview" type="TextureRect" parent="ImageSelectUI/SafeArea/ContentColumn/Scroll/ImageList/ImageCard01"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
 
 [node name="ImageCard02" type="Button" parent="ImageSelectUI/SafeArea/ContentColumn/Scroll/ImageList"]
-custom_minimum_size = Vector2(0, 130)
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
-text = "Misty Valley   New"
+flat = true
+text = ""
+
+[node name="Placeholder" type="ColorRect" parent="ImageSelectUI/SafeArea/ContentColumn/Scroll/ImageList/ImageCard02"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.101961, 0.219608, 0.309804, 1)
+
+[node name="Preview" type="TextureRect" parent="ImageSelectUI/SafeArea/ContentColumn/Scroll/ImageList/ImageCard02"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
 
 [node name="ImageCard03" type="Button" parent="ImageSelectUI/SafeArea/ContentColumn/Scroll/ImageList"]
-custom_minimum_size = Vector2(0, 130)
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
-text = "Lake Dusk   3 Stars"
+flat = true
+text = ""
+
+[node name="Placeholder" type="ColorRect" parent="ImageSelectUI/SafeArea/ContentColumn/Scroll/ImageList/ImageCard03"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.101961, 0.219608, 0.309804, 1)
+
+[node name="Preview" type="TextureRect" parent="ImageSelectUI/SafeArea/ContentColumn/Scroll/ImageList/ImageCard03"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
 
 [node name="ImageCard04" type="Button" parent="ImageSelectUI/SafeArea/ContentColumn/Scroll/ImageList"]
-custom_minimum_size = Vector2(0, 130)
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
-text = "Canyon Sunset   New"
+flat = true
+text = ""
+
+[node name="Placeholder" type="ColorRect" parent="ImageSelectUI/SafeArea/ContentColumn/Scroll/ImageList/ImageCard04"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.101961, 0.219608, 0.309804, 1)
+
+[node name="Preview" type="TextureRect" parent="ImageSelectUI/SafeArea/ContentColumn/Scroll/ImageList/ImageCard04"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
 
 [node name="DifficultySetupUI" type="Control" parent="."]
 visible = false
@@ -225,7 +262,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 
 [node name="SafeArea" type="MarginContainer" parent="DifficultySetupUI"]
 layout_mode = 1
@@ -233,49 +269,44 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 24.0
-offset_top = 28.0
+offset_top = 24.0
 offset_right = -24.0
-offset_bottom = -28.0
+offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 
 [node name="ContentColumn" type="VBoxContainer" parent="DifficultySetupUI/SafeArea"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 16
-mouse_filter = 2
+theme_override_constants/separation = 12
 
 [node name="BackButton" type="Button" parent="DifficultySetupUI/SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(96, 52)
+custom_minimum_size = Vector2(96, 48)
 layout_mode = 2
 text = "Back"
 
 [node name="TitlePanel" type="Panel" parent="DifficultySetupUI/SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 120)
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-mouse_filter = 2
 
 [node name="TitleMargin" type="MarginContainer" parent="DifficultySetupUI/SafeArea/ContentColumn/TitlePanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 20.0
-offset_top = 20.0
-offset_right = -20.0
-offset_bottom = -20.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 
 [node name="Title" type="Label" parent="DifficultySetupUI/SafeArea/ContentColumn/TitlePanel/TitleMargin"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
 text = "Difficulty"
 
 [node name="RowsBox" type="SpinBox" parent="DifficultySetupUI/SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 58)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 min_value = 3.0
 max_value = 6.0
@@ -284,7 +315,7 @@ value = 4.0
 prefix = "Rows "
 
 [node name="ColumnsBox" type="SpinBox" parent="DifficultySetupUI/SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 58)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 min_value = 3.0
 max_value = 6.0
@@ -293,33 +324,31 @@ value = 4.0
 prefix = "Cols "
 
 [node name="RotationToggle" type="CheckButton" parent="DifficultySetupUI/SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 52)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 button_pressed = true
 text = "Shuffle Rotation"
 
 [node name="StorageToggle" type="CheckButton" parent="DifficultySetupUI/SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 52)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "Use Horizontal List"
 
 [node name="StarsPanel" type="Panel" parent="DifficultySetupUI/SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 76)
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
-mouse_filter = 2
 
 [node name="StarsMargin" type="MarginContainer" parent="DifficultySetupUI/SafeArea/ContentColumn/StarsPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 18.0
-offset_top = 18.0
-offset_right = -18.0
-offset_bottom = -18.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 
 [node name="StarsLabel" type="Label" parent="DifficultySetupUI/SafeArea/ContentColumn/StarsPanel/StarsMargin"]
 layout_mode = 2
@@ -330,9 +359,146 @@ text = "Current Difficulty: 3 / 5"
 custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
 size_flags_vertical = 3
-mouse_filter = 2
 
 [node name="StartButton" type="Button" parent="DifficultySetupUI/SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 64)
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Start Puzzle"
+
+[node name="PuzzleGameUI" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SafeArea" type="MarginContainer" parent="PuzzleGameUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 18.0
+offset_right = -16.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RootColumn" type="VBoxContainer" parent="PuzzleGameUI/SafeArea"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="TopBarPanel" type="Panel" parent="PuzzleGameUI/SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+
+[node name="TopBar" type="HBoxContainer" parent="PuzzleGameUI/SafeArea/RootColumn/TopBarPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = 14.0
+offset_right = -14.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="BackButton" type="Button" parent="PuzzleGameUI/SafeArea/RootColumn/TopBarPanel/TopBar"]
+custom_minimum_size = Vector2(90, 44)
+layout_mode = 2
+text = "Back"
+
+[node name="ProgressLabel" type="Label" parent="PuzzleGameUI/SafeArea/RootColumn/TopBarPanel/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Scenery   4 x 4"
+
+[node name="StarLabel" type="Label" parent="PuzzleGameUI/SafeArea/RootColumn/TopBarPanel/TopBar"]
+layout_mode = 2
+text = "3 / 5"
+
+[node name="PuzzleViewportContainer" type="SubViewportContainer" parent="PuzzleGameUI/SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 420)
+layout_mode = 2
+size_flags_vertical = 3
+stretch = true
+
+[node name="PuzzleViewport" type="SubViewport" parent="PuzzleGameUI/SafeArea/RootColumn/PuzzleViewportContainer"]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(720, 960)
+own_world_3d = true
+
+[node name="PuzzleRoot" type="Node3D" parent="PuzzleGameUI/SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport"]
+
+[node name="Camera3D" type="Camera3D" parent="PuzzleGameUI/SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 6.5, 8.5)
+current = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="PuzzleGameUI/SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot"]
+transform = Transform3D(0.819152, -0.280166, 0.501626, 0, 0.873305, 0.487175, -0.573576, -0.399317, 0.71461, 0, 5, 0)
+light_energy = 2.0
+
+[node name="BottomPanel" type="Panel" parent="PuzzleGameUI/SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+
+[node name="BottomColumn" type="VBoxContainer" parent="PuzzleGameUI/SafeArea/RootColumn/BottomPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = 14.0
+offset_right = -14.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="StorageModeTabs" type="HBoxContainer" parent="PuzzleGameUI/SafeArea/RootColumn/BottomPanel/BottomColumn"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ListModeButton" type="Button" parent="PuzzleGameUI/SafeArea/RootColumn/BottomPanel/BottomColumn/StorageModeTabs"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Horizontal List"
+
+[node name="StackModeButton" type="Button" parent="PuzzleGameUI/SafeArea/RootColumn/BottomPanel/BottomColumn/StorageModeTabs"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Stack Area"
+
+[node name="HorizontalPieceList" type="ScrollContainer" parent="PuzzleGameUI/SafeArea/RootColumn/BottomPanel/BottomColumn"]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+horizontal_scroll_mode = 1
+
+[node name="Items" type="HBoxContainer" parent="PuzzleGameUI/SafeArea/RootColumn/BottomPanel/BottomColumn/HorizontalPieceList"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Piece01" type="Panel" parent="PuzzleGameUI/SafeArea/RootColumn/BottomPanel/BottomColumn/HorizontalPieceList/Items"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Piece02" type="Panel" parent="PuzzleGameUI/SafeArea/RootColumn/BottomPanel/BottomColumn/HorizontalPieceList/Items"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="Piece03" type="Panel" parent="PuzzleGameUI/SafeArea/RootColumn/BottomPanel/BottomColumn/HorizontalPieceList/Items"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+
+[node name="StackHintOverlay" type="Label" parent="PuzzleGameUI/SafeArea/RootColumn/BottomPanel/BottomColumn"]
+visible = false
+layout_mode = 2
+text = "Stack mode enabled. Drag pieces from the lower area."

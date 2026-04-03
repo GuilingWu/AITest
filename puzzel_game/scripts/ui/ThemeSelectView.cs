@@ -7,9 +7,7 @@ public partial class ThemeSelectView : Control
 
     public override void _Ready()
     {
-        ConnectButton("SafeArea/ContentColumn/ThemeList/AnimalsButton", "animals");
-        ConnectButton("SafeArea/ContentColumn/ThemeList/SceneryButton", "scenery");
-        ConnectButton("SafeArea/ContentColumn/ThemeList/ArchitectureButton", "architecture");
+        PopulateThemes();
 
         var albumButton = GetNodeOrNull<Button>("SafeArea/ContentColumn/AlbumButton");
         if (albumButton != null)
@@ -18,12 +16,29 @@ public partial class ThemeSelectView : Control
         }
     }
 
-    private void ConnectButton(string path, string themeId)
+    private void PopulateThemes()
     {
-        var button = GetNodeOrNull<Button>(path);
-        if (button != null)
+        var themeList = GetNodeOrNull<VBoxContainer>("SafeArea/ContentColumn/ThemeList");
+        if (themeList == null)
         {
-            button.Pressed += () => EmitSignal(SignalName.ThemeSelected, themeId);
+            return;
+        }
+
+        foreach (Node child in themeList.GetChildren())
+        {
+            child.QueueFree();
+        }
+
+        var catalog = ThemeCatalogLoader.Load();
+        foreach (var theme in catalog.Themes)
+        {
+            var button = new Button
+            {
+                Text = $"{theme.Title}  {theme.Images.Count} images",
+                CustomMinimumSize = new Vector2(0, 56),
+            };
+            button.Pressed += () => EmitSignal(SignalName.ThemeSelected, theme.Id);
+            themeList.AddChild(button);
         }
     }
 }

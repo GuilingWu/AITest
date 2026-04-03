@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/DifficultySetupView.cs" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/DifficultySetupView.cs" id="1_diff"]
 
 [sub_resource type="StyleBoxFlat" id="1_style"]
 bg_color = Color(0.0666667, 0.101961, 0.164706, 0.82)
@@ -36,7 +36,7 @@ Panel/styles/panel = SubResource("1_style")
 default_font_size = 18
 
 [node name="DifficultySetupUI" type="Control"]
-script = ExtResource("1")
+script = ExtResource("1_diff")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -69,10 +69,10 @@ grow_vertical = 2
 [node name="ContentColumn" type="VBoxContainer" parent="SafeArea"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 16
+theme_override_constants/separation = 8
 
 [node name="TitlePanel" type="Panel" parent="SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 120)
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 
 [node name="TitleMargin" type="MarginContainer" parent="SafeArea/ContentColumn/TitlePanel"]
@@ -89,11 +89,11 @@ grow_vertical = 2
 
 [node name="Title" type="Label" parent="SafeArea/ContentColumn/TitlePanel/TitleMargin"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 26
 text = "Difficulty"
 
 [node name="RowsBox" type="SpinBox" parent="SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 58)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 min_value = 3.0
 max_value = 6.0
@@ -102,7 +102,7 @@ value = 4.0
 prefix = "Rows "
 
 [node name="ColumnsBox" type="SpinBox" parent="SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 58)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 min_value = 3.0
 max_value = 6.0
@@ -111,18 +111,18 @@ value = 4.0
 prefix = "Cols "
 
 [node name="RotationToggle" type="CheckButton" parent="SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 52)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 button_pressed = true
 text = "Shuffle Rotation"
 
 [node name="StorageToggle" type="CheckButton" parent="SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 52)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "Use Horizontal List"
 
 [node name="StarsPanel" type="Panel" parent="SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 76)
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 
 [node name="StarsMargin" type="MarginContainer" parent="SafeArea/ContentColumn/StarsPanel"]
@@ -148,6 +148,6 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="StartButton" type="Button" parent="SafeArea/ContentColumn"]
-custom_minimum_size = Vector2(0, 64)
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Start Puzzle"

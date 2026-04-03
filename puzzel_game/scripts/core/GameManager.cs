@@ -21,6 +21,9 @@ public partial class GameManager : Node
     private PuzzleSession? _currentSession;
     private PuzzleImageInfo? _selectedImage;
     private PuzzleConfig? _lastConfig;
+    private string _selectedThemeId = "scenery";
+    private ThemeCatalog _themeCatalog = new();
+    private Texture2D? _activePuzzleTexture;
     private readonly ProgressRepository _progressRepository = new();
     private ProgressData _progressData = new();
     private readonly PieceFactory _pieceFactory = new();
@@ -34,6 +37,7 @@ public partial class GameManager : Node
     {
         _screenRouter = GetNodeOrNull<Control>(ScreenRouterPath);
         _progressData = _progressRepository.Load();
+        _themeCatalog = ThemeCatalogLoader.Load();
         EnsureUiScenes();
         ResolveViews();
         ConnectSignals();
@@ -49,7 +53,8 @@ public partial class GameManager : Node
     {
         if (!string.IsNullOrEmpty(themeId))
         {
-            _imageSelectView?.SetThemeTitle(char.ToUpperInvariant(themeId[0]) + themeId.Substring(1));
+            _selectedThemeId = themeId.ToLowerInvariant();
+            _imageSelectView?.SetTheme(_selectedThemeId);
         }
 
         ShowScreen("ImageSelectUI");
@@ -176,13 +181,15 @@ public partial class GameManager : Node
 
     private void OnPickFromAlbumRequested()
     {
+        _selectedThemeId = "custom";
         _selectedImage = CreatePlaceholderImageInfo("custom_album", "custom", "Album Image");
         ShowDifficultySetup();
     }
 
     private void OnImageSelected(string imageId)
     {
-        _selectedImage = CreatePlaceholderImageInfo(imageId, "scenery", imageId);
+        _selectedImage = ResolvePuzzleImageInfo(_selectedThemeId, imageId)
+            ?? CreatePlaceholderImageInfo(imageId, _selectedThemeId, imageId);
         ShowDifficultySetup();
     }
 
@@ -233,12 +240,15 @@ public partial class GameManager : Node
 
         var inputController = GetOrCreateChild<InputController>(_controlPanel, "InputController");
         inputController.CameraPath = new NodePath("SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot/Camera3D");
+        inputController.ViewportContainerPath = new NodePath("SafeArea/RootColumn/PuzzleViewportContainer");
+        inputController.PuzzleViewportPath = new NodePath("SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport");
         inputController.AreaManagerPath = new NodePath("../AreaManager");
         inputController.MergeSystemPath = new NodePath("../MergeSystem");
         inputController.InteractionCommitted -= OnPuzzleInteractionCommitted;
         inputController.InteractionCommitted += OnPuzzleInteractionCommitted;
 
-        var texture = CreatePlaceholderTexture();
+        var texture = LoadPuzzleTexture(_currentSession.ImageInfo);
+        _activePuzzleTexture = texture;
         var descriptors = _pieceFactory.BuildDescriptors(texture, config);
         _currentSession.Pieces.Clear();
         _currentSession.CombinedGroups.Clear();
@@ -251,6 +261,9 @@ public partial class GameManager : Node
             piecesRoot.AddChild(piece);
             _currentSession.Pieces.Add(piece);
         }
+
+        _controlPanel.SetStorageMode(config.StorageMode);
+        _controlPanel.PopulatePieceList(_currentSession.Pieces, texture);
     }
 
     private void OnPuzzleInteractionCommitted()
@@ -261,6 +274,10 @@ public partial class GameManager : Node
         }
 
         SyncCombinedGroups();
+        if (_activePuzzleTexture != null)
+        {
+            _controlPanel.PopulatePieceList(_currentSession.Pieces, _activePuzzleTexture);
+        }
         RefreshPuzzleHud();
         _currentSession.TryComplete();
     }
@@ -297,6 +314,48 @@ public partial class GameManager : Node
         var total = _currentSession.Config.Rows * _currentSession.Config.Columns;
         _controlPanel.RefreshStars(_currentSession.CalculateStars());
         _controlPanel.RefreshProgress(_currentSession.SolvedCount, total);
+    }
+
+    private PuzzleImageInfo? ResolvePuzzleImageInfo(string themeId, string imageId)
+    {
+        var theme = ThemeCatalogLoader.FindTheme(_themeCatalog, themeId);
+        if (theme == null)
+        {
+            return null;
+        }
+
+        foreach (var image in theme.Images)
+        {
+            if (!string.Equals(image.Id, imageId, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            return new PuzzleImageInfo
+            {
+                Id = image.Id,
+                ThemeId = themeId,
+                DisplayName = string.IsNullOrWhiteSpace(image.Title) ? image.Id : image.Title,
+                SourcePath = $"res://assets/textures/{theme.Folder}/{image.File}",
+                IsCustom = themeId == "custom",
+            };
+        }
+
+        return null;
+    }
+
+    private Texture2D LoadPuzzleTexture(PuzzleImageInfo imageInfo)
+    {
+        if (!string.IsNullOrWhiteSpace(imageInfo.SourcePath) && ResourceLoader.Exists(imageInfo.SourcePath))
+        {
+            var loaded = ResourceLoader.Load<Texture2D>(imageInfo.SourcePath);
+            if (loaded != null)
+            {
+                return loaded;
+            }
+        }
+
+        return CreatePlaceholderTexture();
     }
 
     private static T GetOrCreateChild<T>(Node parent, string name) where T : Node, new()

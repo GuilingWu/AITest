@@ -7,10 +7,14 @@ public partial class InputController : Node
     [Export] public NodePath CameraPath { get; set; } = new("SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport/PuzzleRoot/Camera3D");
     [Export] public NodePath AreaManagerPath { get; set; } = new("../AreaManager");
     [Export] public NodePath MergeSystemPath { get; set; } = new("../MergeSystem");
+    [Export] public NodePath ViewportContainerPath { get; set; } = new("SafeArea/RootColumn/PuzzleViewportContainer");
+    [Export] public NodePath PuzzleViewportPath { get; set; } = new("SafeArea/RootColumn/PuzzleViewportContainer/PuzzleViewport");
 
     private Camera3D? _camera;
     private AreaManager? _areaManager;
     private MergeSystem? _mergeSystem;
+    private SubViewportContainer? _viewportContainer;
+    private SubViewport? _puzzleViewport;
     private Node3D? _selectedNode;
     private Vector2 _pressPosition;
     private ulong _pressTime;
@@ -22,7 +26,7 @@ public partial class InputController : Node
         ResolveDependencies();
     }
 
-    public override void _UnhandledInput(InputEvent @event)
+    public override void _Input(InputEvent @event)
     {
         switch (@event)
         {
@@ -46,6 +50,8 @@ public partial class InputController : Node
         _camera ??= GetNodeOrNull<Camera3D>(CameraPath);
         _areaManager ??= GetNodeOrNull<AreaManager>(AreaManagerPath);
         _mergeSystem ??= GetNodeOrNull<MergeSystem>(MergeSystemPath);
+        _viewportContainer ??= GetNodeOrNull<SubViewportContainer>(ViewportContainerPath);
+        _puzzleViewport ??= GetNodeOrNull<SubViewport>(PuzzleViewportPath);
     }
 
     private void HandleTouch(Vector2 position, bool pressed)
@@ -54,12 +60,18 @@ public partial class InputController : Node
 
         if (pressed)
         {
+            if (!TryMapPointer(position, out var viewportPosition))
+            {
+                _selectedNode = null;
+                return;
+            }
+
             _pressPosition = position;
             _pressTime = Time.GetTicksMsec();
-            _selectedNode = PickNode(position);
+            _selectedNode = PickNode(viewportPosition);
             _dragging = false;
 
-            if (_selectedNode != null && TryProject(position, out var worldPoint))
+            if (_selectedNode != null && TryProject(viewportPosition, out var worldPoint))
             {
                 _dragOffset = _selectedNode.GlobalPosition - worldPoint;
                 SetDragState(_selectedNode, true);
@@ -99,7 +111,7 @@ public partial class InputController : Node
             return;
         }
 
-        if (!TryProject(position, out var worldPoint))
+        if (!TryMapPointer(position, out var viewportPosition) || !TryProject(viewportPosition, out var worldPoint))
         {
             return;
         }
@@ -108,7 +120,29 @@ public partial class InputController : Node
         _selectedNode.GlobalPosition = worldPoint + _dragOffset;
     }
 
-    private bool TryProject(Vector2 screenPosition, out Vector3 worldPoint)
+    private bool TryMapPointer(Vector2 screenPosition, out Vector2 viewportPosition)
+    {
+        ResolveDependencies();
+        viewportPosition = Vector2.Zero;
+        if (_viewportContainer == null || _puzzleViewport == null)
+        {
+            return false;
+        }
+
+        var rect = _viewportContainer.GetGlobalRect();
+        if (!rect.HasPoint(screenPosition))
+        {
+            return false;
+        }
+
+        var local = screenPosition - rect.Position;
+        viewportPosition = new Vector2(
+            local.X * _puzzleViewport.Size.X / rect.Size.X,
+            local.Y * _puzzleViewport.Size.Y / rect.Size.Y);
+        return true;
+    }
+
+    private bool TryProject(Vector2 viewportPosition, out Vector3 worldPoint)
     {
         ResolveDependencies();
         if (_areaManager == null)
@@ -117,10 +151,10 @@ public partial class InputController : Node
             return false;
         }
 
-        return _areaManager.TryProjectPointerToBoard(screenPosition, out worldPoint);
+        return _areaManager.TryProjectPointerToBoard(viewportPosition, out worldPoint);
     }
 
-    private Node3D? PickNode(Vector2 screenPosition)
+    private Node3D? PickNode(Vector2 viewportPosition)
     {
         ResolveDependencies();
         if (_camera == null || _camera.GetWorld3D() == null)
@@ -128,9 +162,11 @@ public partial class InputController : Node
             return null;
         }
 
-        var origin = _camera.ProjectRayOrigin(screenPosition);
-        var end = origin + _camera.ProjectRayNormal(screenPosition) * 1000.0f;
+        var origin = _camera.ProjectRayOrigin(viewportPosition);
+        var end = origin + _camera.ProjectRayNormal(viewportPosition) * 1000.0f;
         var query = PhysicsRayQueryParameters3D.Create(origin, end);
+        query.CollideWithAreas = true;
+        query.CollideWithBodies = true;
         var result = _camera.GetWorld3D().DirectSpaceState.IntersectRay(query);
 
         if (result.Count == 0 || !result.ContainsKey("collider"))
@@ -147,19 +183,19 @@ public partial class InputController : Node
         var current = node;
         while (current != null)
         {
-            if (current is CombinedGroup group)
+            if (current is CombinedGroup)
             {
-                return group;
+                return null;
             }
 
             if (current is Piece piece)
             {
-                if (piece.GetParent() is CombinedGroup parentGroup)
+                if (piece.GetParent() is CombinedGroup)
                 {
-                    return parentGroup;
+                    return null;
                 }
 
-                return piece;
+                return piece.CurrentArea == PieceArea.Storage ? piece : null;
             }
 
             current = current.GetParent();
@@ -206,7 +242,6 @@ public partial class InputController : Node
         _mergeSystem?.TryMerge(node);
     }
 
-
     private static void TrySnapNode(Node3D node)
     {
         if (node is Piece piece)
@@ -232,6 +267,7 @@ public partial class InputController : Node
             }
         }
     }
+
     private static void ApplyArea(Node3D node, PieceArea area)
     {
         if (node is Piece piece)

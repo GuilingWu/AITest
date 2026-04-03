@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/ControlPanel.cs" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/ControlPanel.cs" id="1_panel"]
 
 [sub_resource type="StyleBoxFlat" id="1_style"]
 bg_color = Color(0.0666667, 0.101961, 0.164706, 0.82)
@@ -50,7 +50,7 @@ transparency = 1
 roughness = 0.85
 
 [node name="PuzzleGameUI" type="Control"]
-script = ExtResource("1")
+script = ExtResource("1_panel")
 visible = false
 layout_mode = 3
 anchors_preset = 15
