@@ -4,10 +4,14 @@ const CATALOG_PATH := "res://assets/themes/theme_catalog.json"
 const PIECE_CARD_SIZE := Vector2(96, 96)
 const STACK_SOURCE_HEIGHT := 132.0
 const BOARD_PADDING := 16.0
-const BOARD_GAP := 8.0
+const BOARD_GAP := 0.0
 const PIECE_PREVIEW_SIZE := 144
 const TAB_WIDTH_RATIO := 0.42
 const TAB_DEPTH_RATIO := 0.18
+const PIECE_DISPLAY_SCALE := 1.0 + TAB_DEPTH_RATIO * 2.0
+const PIECE_DISPLAY_OVERHANG := TAB_DEPTH_RATIO / PIECE_DISPLAY_SCALE
+const PIECE_DEPTH_OFFSET := Vector2(6.0, 8.0)
+const BOARD_PIECE_OVERLAP := 4.0
 
 @onready var theme_select_ui: Control = $ThemeSelectUI
 @onready var image_select_ui: Control = $ImageSelectUI
@@ -133,6 +137,18 @@ func _ensure_puzzle_overlay() -> void:
 	_board_panel.offset_right = -BOARD_PADDING
 	_board_panel.offset_bottom = -BOARD_PADDING
 	_board_panel.mouse_filter = Control.MOUSE_FILTER_PASS
+	var board_style := StyleBoxFlat.new()
+	board_style.bg_color = Color(1.0, 1.0, 1.0, 1.0)
+	board_style.border_color = Color(0.86, 0.86, 0.86, 1.0)
+	board_style.border_width_left = 1
+	board_style.border_width_top = 1
+	board_style.border_width_right = 1
+	board_style.border_width_bottom = 1
+	board_style.corner_radius_top_left = 12
+	board_style.corner_radius_top_right = 12
+	board_style.corner_radius_bottom_right = 12
+	board_style.corner_radius_bottom_left = 12
+	_board_panel.add_theme_stylebox_override("panel", board_style)
 	_board_overlay.add_child(_board_panel)
 
 	_board_slots_layer = Control.new()
@@ -445,10 +461,21 @@ func _rebuild_board_slots(rows: int, cols: int, use_horizontal_list: bool) -> vo
 	for row in range(rows):
 		for col in range(cols):
 			var slot := Panel.new()
+			var slot_style := StyleBoxFlat.new()
+			slot_style.bg_color = Color(0.96, 0.83, 0.84, 1.0)
+			slot_style.border_color = Color(0.9, 0.72, 0.75, 1.0)
+			slot_style.border_width_left = 1
+			slot_style.border_width_top = 1
+			slot_style.border_width_right = 1
+			slot_style.border_width_bottom = 1
+			slot_style.corner_radius_top_left = 8
+			slot_style.corner_radius_top_right = 8
+			slot_style.corner_radius_bottom_right = 8
+			slot_style.corner_radius_bottom_left = 8
 			slot.custom_minimum_size = Vector2(cell_size, cell_size)
 			slot.size = Vector2(cell_size, cell_size)
 			slot.position = Vector2(10.0 + col * (cell_size + BOARD_GAP), 10.0 + row * (cell_size + BOARD_GAP))
-			slot.modulate = Color(1.0, 1.0, 1.0, 0.6)
+			slot.add_theme_stylebox_override("panel", slot_style)
 			slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			_board_slots_layer.add_child(slot)
 			_slot_controls.append(slot)
@@ -480,19 +507,19 @@ func _rebuild_piece_sources(rows: int, cols: int, use_horizontal_list: bool) -> 
 
 func _create_source_piece(texture: Texture2D, piece_index: int) -> Button:
 	var button := Button.new()
+	var empty_style := StyleBoxEmpty.new()
 	button.custom_minimum_size = PIECE_CARD_SIZE
 	button.flat = true
 	button.text = ""
 	button.clip_contents = false
+	button.add_theme_stylebox_override("normal", empty_style)
+	button.add_theme_stylebox_override("hover", empty_style)
+	button.add_theme_stylebox_override("pressed", empty_style)
+	button.add_theme_stylebox_override("focus", empty_style)
+	button.add_theme_stylebox_override("disabled", empty_style)
 	button.gui_input.connect(_on_source_piece_gui_input.bind(button, piece_index))
 
-	var preview := TextureRect.new()
-	preview.set_anchors_preset(Control.PRESET_FULL_RECT)
-	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	preview.stretch_mode = TextureRect.STRETCH_SCALE
-	preview.texture = texture
-	button.add_child(preview)
+	button.add_child(_create_piece_visual(texture, false))
 
 	return button
 
@@ -552,19 +579,13 @@ func _create_drag_preview(piece_indices: Array[int], anchor_piece_index: int) ->
 	panel.size = panel_size
 
 	for piece_index in piece_indices:
-		var tile := Panel.new()
-		tile.size = PIECE_CARD_SIZE
+		var tile := Control.new()
+		tile.size = PIECE_CARD_SIZE + Vector2.ONE * BOARD_PIECE_OVERLAP
 		tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var delta: Vector2i = _get_piece_delta(anchor_piece_index, piece_index)
-		tile.position = Vector2(float(delta.x - min_col) * PIECE_CARD_SIZE.x, float(delta.y - min_row) * PIECE_CARD_SIZE.y)
+		tile.position = Vector2(float(delta.x - min_col) * PIECE_CARD_SIZE.x, float(delta.y - min_row) * PIECE_CARD_SIZE.y) - Vector2.ONE * (BOARD_PIECE_OVERLAP * 0.5)
 
-		var preview := TextureRect.new()
-		preview.set_anchors_preset(Control.PRESET_FULL_RECT)
-		preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		preview.stretch_mode = TextureRect.STRETCH_SCALE
-		preview.texture = _piece_textures[piece_index]
-		tile.add_child(preview)
+		tile.add_child(_create_piece_visual(_piece_textures[piece_index], true))
 		panel.add_child(tile)
 
 	return panel
@@ -641,20 +662,21 @@ func _place_piece_in_slot(piece_index: int, slot_index: int, refresh_feedback :=
 
 	var slot := _slot_controls[slot_index]
 	var piece := Button.new()
+	var empty_style := StyleBoxEmpty.new()
 	piece.flat = true
 	piece.text = ""
 	piece.focus_mode = Control.FOCUS_NONE
-	piece.size = slot.size
-	piece.position = slot.position
+	piece.clip_contents = false
+	piece.size = slot.size + Vector2.ONE * BOARD_PIECE_OVERLAP
+	piece.position = slot.position - Vector2.ONE * (BOARD_PIECE_OVERLAP * 0.5)
+	piece.add_theme_stylebox_override("normal", empty_style)
+	piece.add_theme_stylebox_override("hover", empty_style)
+	piece.add_theme_stylebox_override("pressed", empty_style)
+	piece.add_theme_stylebox_override("focus", empty_style)
+	piece.add_theme_stylebox_override("disabled", empty_style)
 	piece.gui_input.connect(_on_board_piece_gui_input.bind(piece_index, slot_index))
 
-	var preview := TextureRect.new()
-	preview.set_anchors_preset(Control.PRESET_FULL_RECT)
-	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	preview.stretch_mode = TextureRect.STRETCH_SCALE
-	preview.texture = _piece_textures[piece_index]
-	piece.add_child(preview)
+	piece.add_child(_create_piece_visual(_piece_textures[piece_index], true))
 
 	_placed_pieces_layer.add_child(piece)
 	_piece_slots[piece_index] = slot_index
@@ -829,6 +851,7 @@ func _refresh_board_feedback() -> void:
 	var correct_count := 0
 	for slot_index in range(_slot_controls.size()):
 		var slot := _slot_controls[slot_index]
+		slot.visible = not _slot_pieces.has(slot_index)
 		if _drag_target_slots.has(slot_index):
 			slot.modulate = Color(0.62, 0.82, 1.0, 0.95)
 			continue
@@ -840,19 +863,14 @@ func _refresh_board_feedback() -> void:
 			else:
 				slot.modulate = Color(1.0, 0.82, 0.62, 0.95)
 		else:
-			slot.modulate = Color(1.0, 1.0, 1.0, 0.6)
+			slot.modulate = Color(1.0, 1.0, 1.0, 1.0)
 
 	for piece_variant in _placed_piece_nodes.keys():
 		var piece_index: int = int(piece_variant)
 		var piece: Control = _placed_piece_nodes[piece_index] as Control
 		if piece == null:
 			continue
-		if _piece_groups.has(piece_index):
-			piece.modulate = Color(0.66, 0.9, 1.0, 1.0)
-		elif _is_piece_in_correct_slot(piece_index):
-			piece.modulate = Color(0.86, 1.0, 0.88, 1.0)
-		else:
-			piece.modulate = Color(1.0, 0.9, 0.78, 1.0)
+		piece.modulate = Color(1.0, 1.0, 1.0, 1.0)
 
 	var total: int = max(1, _current_rows * _current_cols)
 	puzzle_star_label.text = "Matched %d / %d" % [correct_count, total]
@@ -892,12 +910,9 @@ func _play_success_animation(target_slots: Dictionary) -> void:
 		var piece: Control = _placed_piece_nodes.get(int(piece_variant)) as Control
 		if piece == null:
 			continue
-		var base_modulate: Color = piece.modulate
 		var piece_tween := create_tween()
 		piece_tween.tween_property(piece, "scale", Vector2(1.08, 1.08), 0.08)
-		piece_tween.parallel().tween_property(piece, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.08)
 		piece_tween.tween_property(piece, "scale", Vector2.ONE, 0.14)
-		piece_tween.parallel().tween_property(piece, "modulate", base_modulate, 0.14)
 func _build_piece_texture(texture: Texture2D, rows: int, cols: int, index: int) -> Texture2D:
 	var row := index / cols
 	var col := index % cols
@@ -907,27 +922,109 @@ func _build_piece_texture(texture: Texture2D, rows: int, cols: int, index: int) 
 	var texture_width := source_image.get_width()
 	var texture_height := source_image.get_height()
 	var preview_half_extent := 0.5 + TAB_DEPTH_RATIO
-
 	for y in range(PIECE_PREVIEW_SIZE):
 		for x in range(PIECE_PREVIEW_SIZE):
-			var local_x := lerpf(-preview_half_extent, preview_half_extent, (float(x) + 0.5) / float(PIECE_PREVIEW_SIZE))
-			var local_y := lerpf(-preview_half_extent, preview_half_extent, (float(y) + 0.5) / float(PIECE_PREVIEW_SIZE))
-			var local_point := Vector2(local_x, local_y)
-			if not Geometry2D.is_point_in_polygon(local_point, polygon):
+			var local_x: float = lerpf(-preview_half_extent, preview_half_extent, (float(x) + 0.5) / float(PIECE_PREVIEW_SIZE))
+			var local_y: float = lerpf(-preview_half_extent, preview_half_extent, (float(y) + 0.5) / float(PIECE_PREVIEW_SIZE))
+			var local_point: Vector2 = Vector2(local_x, local_y)
+			var top_inside: bool = Geometry2D.is_point_in_polygon(local_point, polygon)
+
+			if not top_inside:
 				output.set_pixel(x, y, Color(0.0, 0.0, 0.0, 0.0))
 				continue
 
-			var uv := Vector2(
+			var uv: Vector2 = Vector2(
 				(float(col) + 0.5 + local_x) / float(cols),
 				(float(row) + 0.5 + local_y) / float(rows)
 			)
 			uv.x = clamp(uv.x, 0.0, 1.0)
 			uv.y = clamp(uv.y, 0.0, 1.0)
-			var sample_x := clampi(int(round(uv.x * float(texture_width - 1))), 0, texture_width - 1)
-			var sample_y := clampi(int(round(uv.y * float(texture_height - 1))), 0, texture_height - 1)
-			output.set_pixel(x, y, source_image.get_pixel(sample_x, sample_y))
+			var sample_x: int = clampi(int(round(uv.x * float(texture_width - 1))), 0, texture_width - 1)
+			var sample_y: int = clampi(int(round(uv.y * float(texture_height - 1))), 0, texture_height - 1)
+			var base_color: Color = source_image.get_pixel(sample_x, sample_y)
+			var highlight: float = clamp((1.0 - uv.x) * 0.42 + (1.0 - uv.y) * 0.58, 0.0, 1.0)
+			var shade: float = clamp(uv.x * 0.58 + uv.y * 0.42, 0.0, 1.0)
+			var lit: Color = base_color
+			lit.r = lerpf(lit.r, min(1.0, lit.r * 1.10), highlight * 0.12)
+			lit.g = lerpf(lit.g, min(1.0, lit.g * 1.07), highlight * 0.10)
+			lit.b = lerpf(lit.b, min(1.0, lit.b * 1.04), highlight * 0.08)
+			lit.r *= lerpf(1.0, 0.92, shade * 0.10)
+			lit.g *= lerpf(1.0, 0.94, shade * 0.08)
+			lit.b *= lerpf(1.0, 0.97, shade * 0.06)
+			output.set_pixel(x, y, lit)
 
 	return ImageTexture.create_from_image(output)
+
+func _create_piece_visual(texture: Texture2D, with_depth: bool) -> Control:
+	if not with_depth:
+		var flat_preview := TextureRect.new()
+		_configure_piece_preview(flat_preview, texture)
+		return flat_preview
+
+	var container := Control.new()
+	container.set_anchors_preset(Control.PRESET_FULL_RECT)
+	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var side := TextureRect.new()
+	_configure_piece_preview(side, texture)
+	side.position = PIECE_DEPTH_OFFSET * 0.35
+	side.material = _create_piece_side_material()
+	container.add_child(side)
+
+	var top := TextureRect.new()
+	_configure_piece_preview(top, texture)
+	top.material = _create_piece_relief_material()
+	container.add_child(top)
+	return container
+
+func _configure_piece_preview(preview: TextureRect, texture: Texture2D) -> void:
+	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	preview.stretch_mode = TextureRect.STRETCH_SCALE
+	preview.texture = texture
+	preview.anchor_left = -PIECE_DISPLAY_OVERHANG
+	preview.anchor_top = -PIECE_DISPLAY_OVERHANG
+	preview.anchor_right = 1.0 + PIECE_DISPLAY_OVERHANG
+	preview.anchor_bottom = 1.0 + PIECE_DISPLAY_OVERHANG
+
+func _create_piece_side_material() -> ShaderMaterial:
+	var shader := Shader.new()
+	shader.code = """
+shader_type canvas_item;
+
+uniform vec4 side_color : source_color = vec4(0.20, 0.24, 0.32, 0.58);
+
+void fragment() {
+	vec4 base = texture(TEXTURE, UV);
+	float shade = clamp(0.72 + UV.y * 0.28, 0.0, 1.0);
+	COLOR = vec4(side_color.rgb * shade, side_color.a * base.a);
+}
+"""
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	return material
+
+func _create_piece_relief_material() -> ShaderMaterial:
+	var shader := Shader.new()
+	shader.code = """
+shader_type canvas_item;
+
+uniform float highlight_strength : hint_range(0.0, 0.4) = 0.18;
+uniform float shade_strength : hint_range(0.0, 0.4) = 0.16;
+
+void fragment() {
+	vec4 base = texture(TEXTURE, UV) * COLOR;
+	float highlight = clamp((1.0 - UV.x) * 0.42 + (1.0 - UV.y) * 0.58, 0.0, 1.0);
+	float shade = clamp(UV.x * 0.58 + UV.y * 0.42, 0.0, 1.0);
+	vec3 lit = base.rgb;
+	lit = mix(lit, lit * 1.12, highlight * highlight_strength);
+	lit *= 1.0 - shade * shade_strength * 0.22;
+	COLOR = vec4(lit, base.a);
+}
+"""
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	return material
 
 func _build_piece_outline(rows: int, cols: int, row: int, col: int) -> Array[Vector2]:
 	var points: Array[Vector2] = []
