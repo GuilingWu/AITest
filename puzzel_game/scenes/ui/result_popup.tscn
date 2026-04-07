@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://6kuydtdbrbf4"]
+[gd_scene format=3 uid="uid://6kuydtdbrbf4"]
 
-[ext_resource type="Script" path="res://scripts/ui/ResultView.cs" id="1_result"]
+[ext_resource type="Script" uid="uid://cqb045vrb7tk2" path="res://scripts/ui/ResultView.cs" id="1_result"]
 
 [sub_resource type="StyleBoxFlat" id="2_style"]
 content_margin_left = 20.0
@@ -35,7 +35,6 @@ Label/colors/font_color = Color(0.960784, 0.972549, 0.988235, 1)
 Panel/styles/panel = SubResource("1_style")
 
 [node name="ResultUI" type="Control" unique_id=1937142873]
-script = ExtResource("1_result")
 visible = false
 layout_mode = 3
 anchors_preset = 15
@@ -44,6 +43,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = SubResource("3_theme")
+script = ExtResource("1_result")
 
 [node name="Background" type="ColorRect" parent="." unique_id=998343936]
 layout_mode = 1

@@ -28,6 +28,9 @@ const BOARD_GAP := 8.0
 @onready var horizontal_piece_items: HBoxContainer = $PuzzleGameUI/SafeArea/RootColumn/BottomPanel/BottomColumn/HorizontalPieceList/Items
 @onready var puzzle_hint_label: Label = $PuzzleGameUI/SafeArea/RootColumn/BottomPanel/BottomColumn/StackHintOverlay
 
+var _result_overlay: Control
+var _result_stars_label: Label
+var _result_summary_label: Label
 var _theme_catalog: Array = []
 var _theme_lookup := {}
 var _theme_id := "scenery"
@@ -64,12 +67,14 @@ var _drag_anchor_piece_index := -1
 var _current_rows := 0
 var _current_cols := 0
 var _current_use_horizontal_list := true
+var _result_shown := false
 
 func _ready() -> void:
 	_load_catalog()
 	_bind_buttons()
 	_configure_puzzle_storage_ui()
 	_ensure_puzzle_overlay()
+	_ensure_result_overlay()
 	_populate_theme_list()
 	_open_theme(_theme_id)
 	_show_screen(theme_select_ui)
@@ -168,6 +173,81 @@ func _ensure_puzzle_overlay() -> void:
 	_drag_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_drag_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	puzzle_game_ui.add_child(_drag_layer)
+
+func _ensure_result_overlay() -> void:
+	if _result_overlay != null:
+		return
+
+	_result_overlay = Control.new()
+	_result_overlay.name = "ResultOverlay"
+	_result_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_result_overlay.visible = false
+	_result_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	puzzle_game_ui.add_child(_result_overlay)
+
+	var backdrop := ColorRect.new()
+	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
+	backdrop.color = Color(0.02, 0.04, 0.08, 0.72)
+	backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
+	_result_overlay.add_child(backdrop)
+
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_result_overlay.add_child(center)
+
+	var card := Panel.new()
+	card.custom_minimum_size = Vector2(420, 260)
+	center.add_child(card)
+
+	var content := VBoxContainer.new()
+	content.set_anchors_preset(Control.PRESET_FULL_RECT)
+	content.offset_left = 24.0
+	content.offset_top = 24.0
+	content.offset_right = -24.0
+	content.offset_bottom = -24.0
+	content.alignment = BoxContainer.ALIGNMENT_CENTER
+	content.add_theme_constant_override("separation", 14)
+	card.add_child(content)
+
+	var title := Label.new()
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.text = "Puzzle Complete"
+	content.add_child(title)
+
+	_result_stars_label = Label.new()
+	_result_stars_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_result_stars_label.text = "Matched 0 / 0"
+	content.add_child(_result_stars_label)
+
+	_result_summary_label = Label.new()
+	_result_summary_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_result_summary_label.text = ""
+	content.add_child(_result_summary_label)
+
+	var retry_button := Button.new()
+	retry_button.text = "Retry"
+	retry_button.custom_minimum_size = Vector2(0, 48)
+	retry_button.pressed.connect(_open_puzzle_game)
+	content.add_child(retry_button)
+
+	var back_button := Button.new()
+	back_button.text = "Back To Themes"
+	back_button.custom_minimum_size = Vector2(0, 48)
+	back_button.pressed.connect(_back_to_theme_select)
+	content.add_child(back_button)
+
+func _show_result_overlay(correct_count: int, total: int) -> void:
+	if _result_overlay == null:
+		return
+	_result_shown = true
+	_result_stars_label.text = "Matched %d / %d" % [correct_count, total]
+	_result_summary_label.text = "%s  %d x %d" % [_selected_image_title if not _selected_image_title.is_empty() else _theme_name, _current_rows, _current_cols]
+	_result_overlay.visible = true
+
+func _hide_result_overlay() -> void:
+	if _result_overlay != null:
+		_result_overlay.visible = false
 
 func _load_catalog() -> void:
 	_theme_catalog.clear()
@@ -313,6 +393,8 @@ func _open_puzzle_game() -> void:
 	_current_rows = int(rows_box.value)
 	_current_cols = int(cols_box.value)
 	_current_use_horizontal_list = storage_toggle.button_pressed
+	_result_shown = false
+	_hide_result_overlay()
 	var title_source := _selected_image_title if not _selected_image_title.is_empty() else _theme_name
 	puzzle_title_label.text = "%s   %d x %d" % [title_source, _current_rows, _current_cols]
 	_apply_storage_mode(_current_use_horizontal_list)
@@ -504,6 +586,7 @@ func _finish_drag(global_position: Vector2) -> void:
 	elif _drag_from_board:
 		_restore_drag_group()
 	_cancel_drag()
+	_refresh_board_feedback()
 
 func _find_slot_at(global_position: Vector2) -> int:
 	for index in range(_slot_controls.size()):
@@ -597,6 +680,7 @@ func _cancel_drag() -> void:
 	_drag_piece_index = -1
 	_drag_piece_indices.clear()
 	_drag_origin_slots.clear()
+	_drag_target_slots.clear()
 	_drag_from_board = false
 	_drag_anchor_piece_index = -1
 	if _drag_preview != null:
@@ -769,6 +853,8 @@ func _refresh_board_feedback() -> void:
 
 	var total: int = max(1, _current_rows * _current_cols)
 	puzzle_star_label.text = "Matched %d / %d" % [correct_count, total]
+	if correct_count >= total and not _result_shown:
+		_show_result_overlay(correct_count, total)
 
 func _play_success_animation(target_slots: Dictionary) -> void:
 	var animated_slots := {}

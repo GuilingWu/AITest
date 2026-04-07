@@ -56,12 +56,14 @@ public partial class MergeSystem : Node
     public CombinedGroup ExecuteMerge(Piece a, Piece b)
     {
         CombinedGroup? targetGroup = null;
+        var groupA = a.GetParent() as CombinedGroup;
+        var groupB = b.GetParent() as CombinedGroup;
 
-        if (a.GetParent() is CombinedGroup groupA)
+        if (groupA != null)
         {
             targetGroup = groupA;
         }
-        else if (b.GetParent() is CombinedGroup groupB)
+        else if (groupB != null)
         {
             targetGroup = groupB;
         }
@@ -72,6 +74,12 @@ public partial class MergeSystem : Node
             targetGroup.Initialize(_nextGroupId++);
             var groupsRoot = GetNodeOrNull<Node>(GroupsRootPath);
             (groupsRoot ?? a.GetParent())?.AddChild(targetGroup);
+        }
+
+        if (groupA != null && groupB != null && groupA != groupB)
+        {
+            targetGroup = groupA;
+            targetGroup.AbsorbGroup(groupB);
         }
 
         targetGroup.AddPiece(a);

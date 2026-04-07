@@ -12,6 +12,7 @@ public sealed class PuzzleSession
     public List<Piece> Pieces { get; } = new();
     public List<CombinedGroup> CombinedGroups { get; } = new();
     public DateTimeOffset StartTime { get; private set; }
+    private bool _isCompleted;
 
     public PuzzleSession(PuzzleImageInfo imageInfo, PuzzleConfig config)
     {
@@ -22,11 +23,12 @@ public sealed class PuzzleSession
     public void Build()
     {
         StartTime = DateTimeOffset.UtcNow;
+        _isCompleted = false;
         Pieces.Clear();
         CombinedGroups.Clear();
     }
 
-    public int SolvedCount => Pieces.Count(piece => piece.CurrentArea == PieceArea.Puzzle);
+    public int SolvedCount => Pieces.Count(piece => piece.IsSolved());
 
     public float GetCurrentProgress()
     {
@@ -54,15 +56,24 @@ public sealed class PuzzleSession
 
     public bool TryComplete()
     {
-        var total = Config.Rows * Config.Columns;
-        var largestGroupSize = CombinedGroups.Count == 0 ? 0 : CombinedGroups.Max(group => group.Pieces.Count);
-        var completed = largestGroupSize == total || (Pieces.Count == total && Pieces.All(piece => piece.CurrentArea == PieceArea.Puzzle));
+        if (_isCompleted)
+        {
+            return true;
+        }
 
+        var total = Config.Rows * Config.Columns;
+        if (Pieces.Count != total)
+        {
+            return false;
+        }
+
+        var completed = Pieces.All(piece => piece.IsSolved());
         if (!completed)
         {
             return false;
         }
 
+        _isCompleted = true;
         var duration = DateTimeOffset.UtcNow - StartTime;
         Completed?.Invoke(new PuzzleResult
         {
@@ -74,3 +85,5 @@ public sealed class PuzzleSession
         return true;
     }
 }
+
+

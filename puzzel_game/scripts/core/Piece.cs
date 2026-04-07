@@ -74,6 +74,32 @@ public partial class Piece : Node3D
         return currentDelta.DistanceTo(expectedDelta) <= positionThreshold;
     }
 
+    public int GetTotalQuarterTurns()
+    {
+        var totalQuarterTurns = CurrentQuarterTurns;
+        if (GetParent() is CombinedGroup group)
+        {
+            totalQuarterTurns += group.CurrentQuarterTurns;
+        }
+
+        return Mathf.PosMod(totalQuarterTurns, 4);
+    }
+
+    public bool IsSolved(float positionThreshold = 0.05f)
+    {
+        if (CurrentArea != PieceArea.Puzzle)
+        {
+            return false;
+        }
+
+        if (GetTotalQuarterTurns() != 0)
+        {
+            return false;
+        }
+
+        return GlobalPosition.DistanceTo(GetSolvedWorldPosition()) <= positionThreshold;
+    }
+
     public void SetArea(PieceArea area)
     {
         CurrentArea = area;

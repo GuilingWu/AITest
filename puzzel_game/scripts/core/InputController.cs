@@ -183,19 +183,19 @@ public partial class InputController : Node
         var current = node;
         while (current != null)
         {
-            if (current is CombinedGroup)
-            {
-                return null;
-            }
-
             if (current is Piece piece)
             {
                 if (piece.GetParent() is CombinedGroup)
                 {
-                    return null;
+                    return piece.GetParent() as Node3D;
                 }
 
                 return piece.CurrentArea == PieceArea.Storage ? piece : null;
+            }
+
+            if (current is CombinedGroup group)
+            {
+                return group;
             }
 
             current = current.GetParent();
@@ -302,3 +302,4 @@ public partial class InputController : Node
         }
     }
 }
+

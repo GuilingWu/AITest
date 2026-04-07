@@ -3,7 +3,9 @@ using Godot;
 
 public partial class PieceFactory : Node
 {
-    private static readonly Shader PuzzleShader = Shader.FromCode(@"
+    private static readonly Shader PuzzleShader = new()
+    {
+        Code = @"
 shader_type spatial;
 render_mode cull_back, diffuse_burley, specular_schlick_ggx;
 
@@ -18,7 +20,8 @@ void fragment()
     ALBEDO = texture(albedo_texture, atlas_uv).rgb;
     ROUGHNESS = roughness_value;
 }
-");
+"
+    };
 
     public List<PieceDescriptor> BuildDescriptors(Texture2D texture, PuzzleConfig config)
     {

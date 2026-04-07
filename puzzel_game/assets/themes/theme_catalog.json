@@ -1,0 +1,37 @@
+{
+  "themes": [
+    {
+      "id": "animals",
+      "title": "Animals",
+      "folder": "animals",
+      "images": [
+        { "id": "animals_0", "title": "0", "file": "0.png" },
+        { "id": "animals_1", "title": "1", "file": "1.png" },
+        { "id": "animals_2", "title": "2", "file": "2.png" },
+        { "id": "animals_3", "title": "3", "file": "3.png" }
+      ]
+    },
+    {
+      "id": "scenery",
+      "title": "Scenery",
+      "folder": "scenery",
+      "images": [
+        { "id": "scenery_0", "title": "0", "file": "0.png" },
+        { "id": "scenery_1", "title": "1", "file": "1.png" },
+        { "id": "scenery_2", "title": "2", "file": "2.png" },
+        { "id": "scenery_3", "title": "3", "file": "3.png" }
+      ]
+    },
+    {
+      "id": "architecture",
+      "title": "Architecture",
+      "folder": "architecture",
+      "images": [
+        { "id": "architecture_0", "title": "0", "file": "0.png" },
+        { "id": "architecture_1", "title": "1", "file": "1.png" },
+        { "id": "architecture_2", "title": "2", "file": "2.png" },
+        { "id": "architecture_3", "title": "3", "file": "3.png" }
+      ]
+    }
+  ]
+}
