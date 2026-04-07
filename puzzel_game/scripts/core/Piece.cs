@@ -2,6 +2,9 @@ using Godot;
 
 public partial class Piece : Node3D
 {
+    private const float DefaultCellSize = 1.0f;
+    private const float DefaultTabDepth = 0.18f;
+
     public PieceDescriptor? Descriptor { get; private set; }
     public int CurrentQuarterTurns { get; private set; }
     public PieceArea CurrentArea { get; private set; } = PieceArea.Unknown;
@@ -15,18 +18,24 @@ public partial class Piece : Node3D
         EnsureChildNodes();
     }
 
-    public void Initialize(PieceDescriptor descriptor, Material material)
+    public void Initialize(PieceDescriptor descriptor, Mesh mesh, Material material, float thickness, float pickBoundsSize)
     {
         Descriptor = descriptor;
         EnsureChildNodes();
 
         if (_meshInstance != null)
         {
-            _meshInstance.Mesh = new BoxMesh
-            {
-                Size = new Vector3(1.0f, 0.2f, 1.0f),
-            };
+            _meshInstance.Mesh = mesh;
             _meshInstance.MaterialOverride = material;
+        }
+
+        var collisionShape = _area3D?.GetNodeOrNull<CollisionShape3D>("CollisionShape3D");
+        if (collisionShape != null)
+        {
+            collisionShape.Shape = new BoxShape3D
+            {
+                Size = new Vector3(pickBoundsSize, thickness, pickBoundsSize),
+            };
         }
 
         Position = descriptor.SolvedLocalPosition;
@@ -129,7 +138,10 @@ public partial class Piece : Node3D
             var collisionShape = new CollisionShape3D
             {
                 Name = "CollisionShape3D",
-                Shape = new BoxShape3D { Size = new Vector3(1.0f, 0.2f, 1.0f) },
+                Shape = new BoxShape3D
+                {
+                    Size = new Vector3(DefaultCellSize + DefaultTabDepth * 2.0f, 0.2f, DefaultCellSize + DefaultTabDepth * 2.0f),
+                },
             };
             _area3D.AddChild(collisionShape);
         }

@@ -15,6 +15,13 @@ public enum PieceArea
     Puzzle = 2,
 }
 
+public enum PieceEdgeShape
+{
+    Flat = 0,
+    Inward = -1,
+    Outward = 1,
+}
+
 [GlobalClass]
 public partial class PuzzleConfig : Resource
 {
@@ -40,6 +47,10 @@ public sealed class PieceDescriptor
     public Vector2I GridIndex { get; init; }
     public Rect2 UvRect { get; init; }
     public Vector3 SolvedLocalPosition { get; init; }
+    public PieceEdgeShape TopEdge { get; init; }
+    public PieceEdgeShape RightEdge { get; init; }
+    public PieceEdgeShape BottomEdge { get; init; }
+    public PieceEdgeShape LeftEdge { get; init; }
 }
 
 public sealed class PuzzleResult

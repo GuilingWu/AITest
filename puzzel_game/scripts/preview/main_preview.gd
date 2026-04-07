@@ -5,6 +5,9 @@ const PIECE_CARD_SIZE := Vector2(96, 96)
 const STACK_SOURCE_HEIGHT := 132.0
 const BOARD_PADDING := 16.0
 const BOARD_GAP := 8.0
+const PIECE_PREVIEW_SIZE := 144
+const TAB_WIDTH_RATIO := 0.42
+const TAB_DEPTH_RATIO := 0.18
 
 @onready var theme_select_ui: Control = $ThemeSelectUI
 @onready var image_select_ui: Control = $ImageSelectUI
@@ -480,14 +483,14 @@ func _create_source_piece(texture: Texture2D, piece_index: int) -> Button:
 	button.custom_minimum_size = PIECE_CARD_SIZE
 	button.flat = true
 	button.text = ""
-	button.clip_contents = true
+	button.clip_contents = false
 	button.gui_input.connect(_on_source_piece_gui_input.bind(button, piece_index))
 
 	var preview := TextureRect.new()
 	preview.set_anchors_preset(Control.PRESET_FULL_RECT)
 	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	preview.stretch_mode = TextureRect.STRETCH_SCALE
 	preview.texture = texture
 	button.add_child(preview)
 
@@ -559,7 +562,7 @@ func _create_drag_preview(piece_indices: Array[int], anchor_piece_index: int) ->
 		preview.set_anchors_preset(Control.PRESET_FULL_RECT)
 		preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		preview.stretch_mode = TextureRect.STRETCH_SCALE
 		preview.texture = _piece_textures[piece_index]
 		tile.add_child(preview)
 		panel.add_child(tile)
@@ -649,7 +652,7 @@ func _place_piece_in_slot(piece_index: int, slot_index: int, refresh_feedback :=
 	preview.set_anchors_preset(Control.PRESET_FULL_RECT)
 	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	preview.stretch_mode = TextureRect.STRETCH_SCALE
 	preview.texture = _piece_textures[piece_index]
 	piece.add_child(preview)
 
@@ -896,16 +899,116 @@ func _play_success_animation(target_slots: Dictionary) -> void:
 		piece_tween.tween_property(piece, "scale", Vector2.ONE, 0.14)
 		piece_tween.parallel().tween_property(piece, "modulate", base_modulate, 0.14)
 func _build_piece_texture(texture: Texture2D, rows: int, cols: int, index: int) -> Texture2D:
-	var atlas := AtlasTexture.new()
-	atlas.atlas = texture
-
-	var texture_size := texture.get_size()
-	var piece_width := texture_size.x / float(cols)
-	var piece_height := texture_size.y / float(rows)
 	var row := index / cols
 	var col := index % cols
-	atlas.region = Rect2(col * piece_width, row * piece_height, piece_width, piece_height)
-	return atlas
+	var source_image := texture.get_image()
+	var output := Image.create(PIECE_PREVIEW_SIZE, PIECE_PREVIEW_SIZE, false, Image.FORMAT_RGBA8)
+	var polygon := PackedVector2Array(_build_piece_outline(rows, cols, row, col))
+	var texture_width := source_image.get_width()
+	var texture_height := source_image.get_height()
+	var preview_half_extent := 0.5 + TAB_DEPTH_RATIO
+
+	for y in range(PIECE_PREVIEW_SIZE):
+		for x in range(PIECE_PREVIEW_SIZE):
+			var local_x := lerpf(-preview_half_extent, preview_half_extent, (float(x) + 0.5) / float(PIECE_PREVIEW_SIZE))
+			var local_y := lerpf(-preview_half_extent, preview_half_extent, (float(y) + 0.5) / float(PIECE_PREVIEW_SIZE))
+			var local_point := Vector2(local_x, local_y)
+			if not Geometry2D.is_point_in_polygon(local_point, polygon):
+				output.set_pixel(x, y, Color(0.0, 0.0, 0.0, 0.0))
+				continue
+
+			var uv := Vector2(
+				(float(col) + 0.5 + local_x) / float(cols),
+				(float(row) + 0.5 + local_y) / float(rows)
+			)
+			uv.x = clamp(uv.x, 0.0, 1.0)
+			uv.y = clamp(uv.y, 0.0, 1.0)
+			var sample_x := clampi(int(round(uv.x * float(texture_width - 1))), 0, texture_width - 1)
+			var sample_y := clampi(int(round(uv.y * float(texture_height - 1))), 0, texture_height - 1)
+			output.set_pixel(x, y, source_image.get_pixel(sample_x, sample_y))
+
+	return ImageTexture.create_from_image(output)
+
+func _build_piece_outline(rows: int, cols: int, row: int, col: int) -> Array[Vector2]:
+	var points: Array[Vector2] = []
+	var half_size := 0.5
+
+	_append_horizontal_edge(points, -half_size, half_size, -half_size, _get_piece_edge(rows, cols, row, col, "top"), -1.0)
+	_append_vertical_edge(points, -half_size, half_size, half_size, _get_piece_edge(rows, cols, row, col, "right"), 1.0)
+	_append_horizontal_edge(points, half_size, -half_size, half_size, _get_piece_edge(rows, cols, row, col, "bottom"), 1.0)
+	_append_vertical_edge(points, half_size, -half_size, -half_size, _get_piece_edge(rows, cols, row, col, "left"), -1.0)
+	return points
+
+func _get_piece_edge(rows: int, cols: int, row: int, col: int, side: String) -> int:
+	match side:
+		"top":
+			if row == 0:
+				return 0
+			return -_deterministic_edge(row - 1, col, 17)
+		"right":
+			if col == cols - 1:
+				return 0
+			return _deterministic_edge(row, col, 53)
+		"bottom":
+			if row == rows - 1:
+				return 0
+			return _deterministic_edge(row, col, 17)
+		"left":
+			if col == 0:
+				return 0
+			return -_deterministic_edge(row, col - 1, 53)
+	return 0
+
+func _deterministic_edge(row: int, col: int, salt: int) -> int:
+	var hash := row * 92821 + col * 68917 + salt * 2971
+	return 1 if (hash & 1) == 0 else -1
+
+func _append_horizontal_edge(points: Array[Vector2], start_x: float, end_x: float, y: float, edge_shape: int, outward_sign: float) -> void:
+	var direction: float = sign(end_x - start_x)
+	var tab_width: float = TAB_WIDTH_RATIO
+	var tab_depth: float = TAB_DEPTH_RATIO * outward_sign * float(edge_shape)
+	var center_x: float = (start_x + end_x) * 0.5
+	var tab_start: float = center_x - tab_width * 0.5 * direction
+	var tab_end: float = center_x + tab_width * 0.5 * direction
+
+	_add_point(points, Vector2(start_x, y))
+	_add_point(points, Vector2(tab_start, y))
+
+	if edge_shape != 0:
+		for segment in range(1, 10):
+			var t: float = float(segment) / 10.0
+			var x: float = lerpf(tab_start, tab_end, t)
+			var offset: float = sin(t * PI) * tab_depth
+			_add_point(points, Vector2(x, y + offset))
+
+	_add_point(points, Vector2(tab_end, y))
+	_add_point(points, Vector2(end_x, y))
+
+func _append_vertical_edge(points: Array[Vector2], start_y: float, end_y: float, x: float, edge_shape: int, outward_sign: float) -> void:
+	var direction: float = sign(end_y - start_y)
+	var tab_width: float = TAB_WIDTH_RATIO
+	var tab_depth: float = TAB_DEPTH_RATIO * outward_sign * float(edge_shape)
+	var center_y: float = (start_y + end_y) * 0.5
+	var tab_start: float = center_y - tab_width * 0.5 * direction
+	var tab_end: float = center_y + tab_width * 0.5 * direction
+
+	_add_point(points, Vector2(x, start_y))
+	_add_point(points, Vector2(x, tab_start))
+
+	if edge_shape != 0:
+		for segment in range(1, 10):
+			var t: float = float(segment) / 10.0
+			var y: float = lerpf(tab_start, tab_end, t)
+			var offset: float = sin(t * PI) * tab_depth
+			_add_point(points, Vector2(x + offset, y))
+
+	_add_point(points, Vector2(x, tab_end))
+	_add_point(points, Vector2(x, end_y))
+
+func _add_point(points: Array[Vector2], point: Vector2) -> void:
+	if points.is_empty() or points[-1].distance_to(point) > 0.0001:
+		points.append(point)
+
 
 func _load_selected_texture() -> Texture2D:
 	var texture_path := _resolve_selected_texture_path()
